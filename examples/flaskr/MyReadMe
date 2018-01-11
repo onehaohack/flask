@@ -1,0 +1,17 @@
+git clone https://github.com/pallets/flask.git
+cd flask/
+pip install -e .
+cd examples/flaskr/
+pip install -e .
+export FLASK_APP="flaskr.factory:create_app()"
+flask initdb
+flask run
+what the README missing is
+
+pip install -e . need to be done in flask and flaskr, two dirs
+export statement need double quote
+
+
+
+0.0.0.0 to make server public
+python3 -m flask run -h 0.0.0.0
