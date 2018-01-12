@@ -6,24 +6,8 @@
         <dt>Title:
         <dd><input type="text" size="30" name="title">
         <dt>Text:
-        <dd> <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
+        <dd> <textarea name="text" rows="5" cols="80"></textarea>
 
-<!-- Create the editor container -->
-<div id="editor" name="text">
-  <p>Hello World!</p>
-  <p>Some initial <strong>bold</strong> text</p>
-  <p><br></p>
-</div>
-
-<!-- Include the Quill library -->
-<script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
-
-<!-- Initialize Quill editor -->
-<script>
-  var quill = new Quill('#editor', {
-    theme: 'snow'
-  });
-</script>
         <dd><input type="submit" value="Share">
       </dl>
     </form>
