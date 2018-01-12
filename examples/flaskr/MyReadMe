@@ -4,8 +4,8 @@ pip install -e .
 cd examples/flaskr/
 pip install -e .
 export FLASK_APP="flaskr.factory:create_app()"
-flask initdb
-flask run
+python3 -m flask  initdb
+python3 -m flask run -h 0.0.0.0
 what the README missing is
 
 pip install -e . need to be done in flask and flaskr, two dirs
