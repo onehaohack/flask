@@ -62,3 +62,6 @@ def register_teardowns(app):
         """Closes the database again at the end of the request."""
         if hasattr(g, 'sqlite_db'):
             g.sqlite_db.close()
+
+if __name__ == '__main__':
+    create_app().run(port=5001)

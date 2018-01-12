@@ -45,6 +45,7 @@ def get_db():
 
 @bp.route('/')
 def show_entries():
+    #return "Hello World !!~~"
     db = get_db()
     cur = db.execute('select title, text from entries order by id desc')
     entries = cur.fetchall()
