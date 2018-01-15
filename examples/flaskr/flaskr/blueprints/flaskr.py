@@ -11,12 +11,16 @@
 """
 
 from sqlite3 import dbapi2 as sqlite3
+
+from cache.redisutils import RedisUtils
 from flask import Blueprint, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app
 
 
 # create our blueprint :)
 bp = Blueprint('flaskr', __name__)
+
+redis_utils = RedisUtils()
 
 
 def connect_db():
@@ -68,6 +72,16 @@ def add_entry():
 def login():
     error = None
     if request.method == 'POST':
+        if not redis_utils.is_user_exist(request.form['username']):
+            error = 'user does not exist'
+        else:
+            if request.form['password'] == redis_utils.get_user(request.form['username']):
+                session['logged_in'] = True
+                flash('You were logged in')
+                return redirect(url_for('flaskr.show_entries'))
+            else:
+                error = 'username & password does not match'
+
         if request.form['username'] != current_app.config['USERNAME']:
             error = 'Invalid username'
         elif request.form['password'] != current_app.config['PASSWORD']:

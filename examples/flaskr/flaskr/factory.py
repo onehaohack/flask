@@ -11,13 +11,17 @@
 """
 
 import os
-from flask import Flask, g
+
 from werkzeug.utils import find_modules, import_string
+
+from cache.redisutils import RedisUtils
+from flask import Flask, g
 from flaskr.blueprints.flaskr import init_db
 
 
 def create_app(config=None):
     app = Flask('flaskr')
+    redis = RedisUtils()
 
     app.config.update(dict(
         DATABASE=os.path.join(app.root_path, 'flaskr.db'),
@@ -26,6 +30,8 @@ def create_app(config=None):
         USERNAME='admin',
         PASSWORD='default'
     ))
+
+    redis.init_users()
     app.config.update(config or {})
     app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
