@@ -14,6 +14,8 @@ class RedisUtils:
     def init_users(self):
         #self.r.set('test', Account('test', 'test'))
         self.r.set('test', 'test')
+        self.r.set('testuser1', 'test')
+        self.r.set('testuser2', 'test')
 
     def get_user(self, username=''):
         self.r.set_response_callback('HGET', str)

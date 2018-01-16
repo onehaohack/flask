@@ -15,19 +15,27 @@ from sqlite3 import dbapi2 as sqlite3
 from cache.redisutils import RedisUtils
 from flask import Blueprint, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app
-
+import MySQLdb
 
 # create our blueprint :)
 bp = Blueprint('flaskr', __name__)
 
 redis_utils = RedisUtils()
 
+username = ''
 
-def connect_db():
+
+def connect_db2():
     """Connects to the specific database."""
     rv = sqlite3.connect(current_app.config['DATABASE'])
     rv.row_factory = sqlite3.Row
     return rv
+
+
+def connect_db():
+    """Connects to the specific database."""
+    db = MySQLdb.connect(user="root", db="dev")
+    return db
 
 
 def init_db():
@@ -38,7 +46,7 @@ def init_db():
     db.commit()
 
 
-def get_db():
+def get_db2():
     """Opens a new database connection if there is none yet for the
     current application context.
     """
@@ -47,13 +55,24 @@ def get_db():
     return g.sqlite_db
 
 
+def get_db():
+    """Opens a new database connection if there is none yet for the
+    current application context.
+    """
+    if not hasattr(g, 'mysql_cursor'):
+        g.sqlite_cursor = connect_db()
+    return g.sqlite_cursor
+
+
 @bp.route('/')
 def show_entries():
     #return "Hello World !!~~"
-    db = get_db()
-    cur = db.execute('select title, text from entries order by id desc')
+
+    cur = get_db().cursor()
+    cur.execute('select title, text, user from entries order by id desc')
     entries = cur.fetchall()
-    return render_template('show_entries.html', entries=entries)
+    rows = [item for item in entries]
+    return render_template('show_entries.html', entries=rows)
 
 
 @bp.route('/add', methods=['POST'])
@@ -61,8 +80,8 @@ def add_entry():
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    db.execute('insert into entries (title, text) values (?, ?)',
-               [request.form['title'], request.form['text']])
+    db.cursor().execute("""insert into entries (title, text, user) values (%s, %s, %s)""",
+                   [request.form['title'], request.form['text'], session['username']])
     db.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('flaskr.show_entries'))
@@ -77,6 +96,7 @@ def login():
         else:
             if request.form['password'] == redis_utils.get_user(request.form['username']):
                 session['logged_in'] = True
+                session['username'] = request.form['username']
                 flash('You were logged in')
                 return redirect(url_for('flaskr.show_entries'))
             else:
@@ -88,6 +108,7 @@ def login():
             error = 'Invalid password'
         else:
             session['logged_in'] = True
+            session['username'] = request.form['username']
             flash('You were logged in')
             return redirect(url_for('flaskr.show_entries'))
     return render_template('login.html', error=error)
